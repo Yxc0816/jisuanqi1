@@ -1,219 +1,218 @@
 package com.example.jisuanqi1;
 
-import android.content.res.Configuration;
-
-import java.math.BigDecimal;//Java在java.math包中提供的API类BigDecimal，用来对超过16位有效位的数进行精确的运算。
-import java.util.ArrayDeque;
-import java.util.ArrayList;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Arrays;
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.List;
+import java.util.Stack;
+import java.lang.String;
+
+
 
 
 public class jisuanqi {
 
-    public static BigDecimal calculator(List list){
-        Deque<BigDecimal> deque = new ArrayDeque<>();
-        try {
-            Iterator it = list.iterator();
-            while (it.hasNext()) {
-                Object o = it.next();
-                if (o.getClass() == BigDecimal.class) {
-                    deque.addFirst((BigDecimal) o);
-                } else if (o.getClass() == Character.class) {
-
-                    BigDecimal first = deque.removeFirst();
-                    BigDecimal second = deque.remove();
-                    BigDecimal out = null;
-                    if ((Character) o == '+') {
-                        out = second.add(first);
-                        deque.addFirst(out);
-                    } else if ((Character) o == '-') {
-                        out = second.subtract(first);
-                        deque.addFirst(out);
-                    } else if ((Character) o == '*') {
-                        out = second.multiply(first);
-                        deque.addFirst(out);
-                    } else if ((Character) o == '/') {
-                        Double out2 = second.doubleValue() / first.doubleValue();
-                        String out3 = out2.toString();
-                        deque.addFirst(new BigDecimal(out3));
-                    }
-
-                }
-            }
-            BigDecimal comeOut = deque.removeFirst();
-            return comeOut;
-        } catch (Exception e) {
-            e.printStackTrace();
-            BigDecimal error = new BigDecimal("error");
-            return error;
-        }
+    static String getResult(String str) {
+        //分割
+        String[] Str = segment(str);
+        //中缀转后缀
+        String newStr = infToSuf(Str);
+        //后缀计算
+        String result = sufToRes(newStr);
+        return sufToRes(result);
     }
 
+    private static String[] segment(String str) {
 
-    public static List transferToBehind(char[] mid){
-        Deque<Character> deque = new ArrayDeque<>();
-        List list = new ArrayList();
-
-        int len = mid.length;
-        int i,k=0;
-
-        for (i = 0; i < len; i++){
-            if ( (judgeSymbol(mid[i]) && ((i > 0 && mid[i-1] != ')') || i == 0) ) || mid[i] == ')'
-                    && !lastBracket(mid,i) && k != i){
-                if (mid[i] == '-' && (i == 0 || judgeSymbol(mid[i-1]) || judgeBrackets(mid[i-1]))){
-                    continue;
+        String[] exp = new String[str.length()+1];
+        //找最近的索引并截取字符串
+        int l = str.length();
+        for(int i = 0;i < l+1;i++) {
+            int index;
+            int[] ind = new int[6];
+            ind[0] = str.indexOf('+');
+            ind[1] = str.indexOf('-');
+            ind[2] = str.indexOf('*');
+            ind[3] = str.indexOf('/');
+            ind[4] = str.indexOf('(');
+            ind[5] = str.indexOf(')');
+            if(ind[1] == 0) {
+                Arrays.sort(ind);
+                int t;
+                for(t = 0;t <6;t++) {
+                    if(ind[t] >= 0)
+                        break;
                 }
-
-                String number = new String(mid).substring(k, i);
-
-                if (number.contains(")")){
-                    while ( deque.peekFirst() != '('){
-                        list.add(deque.removeFirst());
-                    }
-                    deque.removeFirst();
-                    continue;
+                int r = ind[t+1];
+                exp[i] = str.substring(0,r);
+                i++;
+                exp[i] = str.substring(r,r+1);
+                str = str.substring(r+1);
+            }else if(((ind[1]-ind[4]) == 1) && (ind[4]==0)) {
+                Arrays.sort(ind);
+                int t ;
+                for(t = 0;t <6;t++) {
+                    if(ind[t] >= 0)
+                        break;
                 }
-
-                BigDecimal num = new BigDecimal(number);
-                list.add(num);
-                if (judgeSymbol(mid[i]) )
-                    k = i + 1;
-                else if (mid[i] == ')'){
-                    k = i + 2;
-                }
-            }
-
-            if (judgeNumber(mid[i]) && lastNumber(mid,i)){
-                String number = new String(mid).substring(i);
-                list.add(new BigDecimal(number));
-                break;
-            }
-
-            if (mid[i] == '('){
-                k++;
-            }
-
-            if (judgeSymbol(mid[i]) || judgeBrackets(mid[i]) ){
-                if (mid[i] == '*' || mid[i] == '/'){
-                    if (!deque.isEmpty() && (deque.peekFirst() == '*' || deque.peekFirst() == '/')){
-                        while (!deque.isEmpty() && deque.peekFirst() != '(' && deque.peekFirst() != '+'
-                                && deque.peekFirst() != '-'){
-                            list.add(deque.remove());
-                        }
-                    }
-                    deque.addFirst(mid[i]);
-                }else if (mid[i] == '+' || mid[i] == '-'){
-                    if (deque.isEmpty()){
-                        deque.addFirst(mid[i]);
-                    }else if (judgeSymbol(deque.peekFirst())){
-                        while ( !deque.isEmpty() && deque.peekFirst() != '('){
-                            list.add(deque.removeFirst());
-                        }
-                        deque.addFirst(mid[i]);
-                    }else {
-                        deque.addFirst(mid[i]);
-                    }
-                }else if (mid[i] == '('){
-                    deque.addFirst(mid[i]);
-                }else if (mid[i] == ')'){
-                    while ( deque.peekFirst() != '('){
-                        list.add(deque.removeFirst());
-                    }
-                    deque.removeFirst();
-                }
+                int r = ind[t+1];
+                exp[i] = str.substring(0,1);
+                i++;
+                exp[i] = str.substring(1,r+2);
+                i++;
+                exp[i] = str.substring(r+2,r+3);
+                str = str.substring(r+3);
             }else {
-                continue;
+                Arrays.sort(ind);
+                int t;
+                for(t = 0;t <6;t++) {
+                    if(ind[t] >= 0)
+                        break;
+                }
+                if(t==6)
+                    break;
+                index = ind[t];
+                if(index!=0) {
+                    exp[i] = str.substring(0,index);
+                    i++;
+                }
+                exp[i] = str.substring(index,index+1);
+                str = str.substring(index+1);
             }
         }
-        int m = 1;
-        while ( !deque.isEmpty() && (deque.peekFirst() == '(' || deque.peekFirst() == ')')){
-            deque.removeFirst();
-            System.out.println("有" + m++ + "个括号不匹配");
+        int j = 0;
+        int k = 0;
+        for(; exp[j]!=null ;j++){}
+        if(!exp[j-1].equals(")")) {
+            exp[j]=str;
+            str = "";
+            k = j;
+        }else {
+            k = j-1;
         }
-        if (!deque.isEmpty()) {
-            list.add(deque.removeFirst());
+        String[] expp = new String[k+1];
+        for(int t = 0; t < k+1;t++) {
+            expp[t] = exp[t];
         }
-        return list;
+        return expp;
+        //System.out.println("分割的字符串:");
     }
 
 
-    public static boolean judgeSymbol(char word){
-        if (word == '+' || word == '-' || word == '*' || word == '/' ){
-            return true;
+    private static String infToSuf(String[] exp) {
+
+        String newStrs = "";
+        //初始化栈
+        Stack<String> stack = new Stack<>();
+	        /*
+	                     判断并放入后缀表达式中：
+	            for循环遍历整个str进行判断
+	                     循环结束若栈不为空全部出栈
+	        */
+        int l = exp.length;
+        for(int i = 0; i < l; i++) {
+            if ((stack.empty()) && (exp[i].equals("+") || exp[i].equals("-") || exp[i].equals("*") || exp[i].equals("/"))) {
+                stack.push(exp[i]);
+            } else if (exp[i].equals("(")) {
+                stack.push(exp[i]);
+            } else if (exp[i].equals("*") || exp[i].equals("/")) {
+                while (stack.peek().equals("*") || stack.peek().equals("/")) {
+                    newStrs = newStrs.concat(stack.pop()+" ");
+                    if(stack.isEmpty()) {
+                        break;
+                    }
+                }
+                stack.push(exp[i]);
+            } else if (exp[i].equals("+") || exp[i].equals("-")) {
+                while (!(stack.isEmpty())&&((stack.peek()).equals("*") || (stack.peek()).equals("/") || (stack.peek()).equals("+") || (stack.peek()).equals("-"))) {
+                    newStrs = newStrs.concat(stack.pop()+" ");
+                    if(stack.isEmpty()) {
+                        break;
+                    }
+                }
+                stack.push(exp[i]);
+            } else if (exp[i].equals(")")) {
+                int t = stack.search("(");
+                for (int k = 1; k < t; k++) {
+                    newStrs = newStrs.concat(stack.pop()+" ");
+                }
+                String tstr = stack.pop();
+            } else {
+                newStrs = newStrs.concat(exp[i]+ " ");
+            }
         }
-        return false;
-    }
-    public static boolean judgeBrackets(char word){
-        if (word == '(' || word == ')'){
-            return true;
+        while (!stack.empty()) {
+            if (!stack.peek().equals("(") || !stack.peek().equals(")")) {
+                newStrs = newStrs.concat(stack.pop()+" ");
+            } else if (stack.peek().equals("(") || stack.peek().equals(")")) {
+                String tstr = stack.pop();
+            }
         }
-        return false;
+//      System.out.println("后缀:"+newStrs);
+        return newStrs;
     }
 
-    public static boolean judgeNumber(char word){
-        if ( (word >= '0' && word <= '9' )|| word == '.'){
-            return true;
-        }
-        return false;
-    }
-
-    public static boolean lastNumber(char[] mid,int i){
-        String str = new String(mid);
-        String rest = str.substring(i+1);
-        if (rest.contains("*") || rest.contains("/") || rest.contains("+") ||rest.contains("-") ||rest.contains("(")
-                || rest.contains(")") ){
-            return false;
-        }
-        return true;
-    }
-
-    public static boolean lastBracket(char[] mid, int i){
-        if (mid[i-1] != ')' || mid[i-2] == ')'){
-            return false;
-        }
-        String rest = new String(mid).substring(i);
-        if (rest.contains("0") || rest.contains("1") ||rest.contains("2") || rest.contains("3") || rest.contains("4") ||
-                rest.contains("5") ||rest.contains("6") || rest.contains("7") || rest.contains("8") || rest.contains("9")){
-            return false;
-        }
-        return true;
-    }
-
-    public static boolean judgeIllegal(char[] mid,int i){
-        String rest = new String(mid).substring(i);
-        if (!rest.contains("+") && !rest.contains("-") && !rest.contains("*") && !rest.contains("/") &&
-                !rest.contains("(") && !rest.contains(")") && !rest.contains("0") && !rest.contains("1") &&
-                !rest.contains("2") && !rest.contains("3") && !rest.contains("4") && !rest.contains("5") &&
-                !rest.contains("6") && !rest.contains("7") && !rest.contains("8") && !rest.contains("9")){
-            return true;
-        }
-        return false;
-    }
-
-    public static char[] cutString(char[] mid){
-        for (int i = 0; i < mid.length; i++){
-            if (!judgeBrackets(mid[i]) && !judgeSymbol(mid[i]) && !judgeNumber(mid[i])){
-                System.out.println("出现非法字符！已为你自动消除");
-                if (i == 0){
-                    mid = Arrays.copyOfRange(mid,1,mid.length);
-                    i--;
-                }else if (judgeIllegal(mid,i)){
-                    mid = Arrays.copyOfRange(mid,0,i);
-                    break;
+    private static String sufToRes(String sufStr) {
+        String[] exp = sufStr.split(" ");
+        Stack<String> stack = new Stack<>();
+        String Res = "";
+        for(int i = 0;i < exp.length; i++) {
+            if(!exp[i].equals("+") && !exp[i].equals("-") && !exp[i].equals("*") && !exp[i].equals("/")){
+                stack.push(exp[i]);
+            }else if(exp[i].equals("+")) {
+                BigDecimal b2 = new BigDecimal(stack.pop());
+                BigDecimal b1 = new BigDecimal(stack.pop());
+                BigDecimal b3 = b1.add(b2);
+                stack.push(b3.toString());
+            }else if(exp[i].equals("-")) {
+                BigDecimal b2 = new BigDecimal(stack.pop());
+                BigDecimal b1 = new BigDecimal(stack.pop());
+                BigDecimal b3 = b1.subtract(b2);
+                stack.push(b3.toString());
+            }else if(exp[i].equals("*")) {
+                BigDecimal b2 = new BigDecimal(stack.pop());
+                BigDecimal b1 = new BigDecimal(stack.pop());
+                BigDecimal b3 = new BigDecimal(0);
+                if(b1.compareTo(BigDecimal.ZERO)== 0|| b2.compareTo(BigDecimal.ZERO) == 0) {
+                    b3 = BigDecimal.ZERO;
                 }else {
-                    char[] beyond = Arrays.copyOfRange(mid,0,i);
-                    char[] behind = Arrays.copyOfRange(mid,i+1,mid.length);
-                    String str1 = new String(beyond);
-                    String str2 = new String(behind);
-                    String temp = str1 + str2;
-                    mid = temp.toCharArray();
-                    i--;
+                    b3 = b1.multiply(b2);
+                }
+                stack.push(b3.toString());
+            }else if(exp[i].equals("/")){
+                BigDecimal b2 = new BigDecimal(stack.pop());
+                BigDecimal b1 = new BigDecimal(stack.pop());
+                BigDecimal b3 = new BigDecimal(0);
+                double d1 = b1.doubleValue();
+                double d2 = b2.doubleValue();
+                if(d1%d2 == 0){
+                    b3 = (b1.divide(b2));
+                    stack.push(b3.toString());
+                }else {
+                    b3 = b1.divide(b2,10, RoundingMode.HALF_UP);
+                    stack.push(b3.toString());
                 }
             }
         }
-        return mid;
+        Res = stack.pop();
+        boolean flag = false;
+        for (int m = 0; m < Res.length() - 1;m++) {
+            if(Res.charAt(m) == '.'){
+                flag = true;
+            }
+        }
+        if(flag) {
+            for(int m = Res.length()-1;m >= 0;m--) {
+                if(Res.charAt(m) == '0'){
+                }else {
+                    Res = Res.substring(0,m+1);
+                    break;
+                }
+            }
+            if(Res.charAt(Res.length()-1) == '.') {
+                Res = Res.substring(0,Res.length()-1);
+            }
+        }
+        return Res;
     }
+
 }

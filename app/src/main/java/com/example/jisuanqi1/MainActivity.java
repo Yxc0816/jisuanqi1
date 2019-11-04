@@ -1,8 +1,10 @@
 package com.example.jisuanqi1;
 
-import androidx.appcompat.app.AlertDialog;
+
 import androidx.appcompat.app.AppCompatActivity;
 
+
+import java.lang.String;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -24,7 +26,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
 
         try{
             Button left_button = (Button) findViewById(R.id.left_button);
@@ -339,11 +340,8 @@ public class MainActivity extends AppCompatActivity {
                     TextView txt = (TextView) findViewById(R.id.txt);
                     try{
                         String middle=txt.getText().toString();
-                        char[] mid = middle.toCharArray();
-                        mid = jisuanqi.cutString(mid);
-                        List list = jisuanqi.transferToBehind(mid);
-                        BigDecimal comeOut = jisuanqi.calculator(list);
-                        txt.setText(comeOut.toString());
+                        String result=jisuanqi.getResult(middle);
+                        txt.setText(result.toString());
                     } catch (Exception e) {
                         e.printStackTrace();
                         txt.setText("ERROR");
