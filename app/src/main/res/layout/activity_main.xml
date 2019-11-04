@@ -21,9 +21,18 @@
     <Button
         android:id="@+id/binary_button"
         android:layout_rowSpan="1"
-        android:layout_columnSpan="4"
+        android:layout_columnSpan="2"
         android:layout_gravity="fill"
         android:text="二进制" />
+
+    <Button
+        android:id="@+id/help_button"
+        android:layout_rowSpan="1"
+        android:layout_columnSpan="2"
+        android:layout_columnWeight="2"
+        android:layout_rowWeight="1"
+        android:text="..."
+        android:textSize="40sp" />
 
     <Button
         android:id="@+id/sin_button"
@@ -181,7 +190,7 @@
         android:layout_gravity="fill"
         android:layout_columnWeight="1"
         android:layout_rowWeight="1"
-        android:background="@color/orange"
+        android:background="@color/blue"
         android:text="=" />
 
 </GridLayout>

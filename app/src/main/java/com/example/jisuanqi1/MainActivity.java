@@ -1,7 +1,9 @@
 package com.example.jisuanqi1;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -9,7 +11,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -157,6 +162,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
 
         try{
             Button five_button = (Button) findViewById(R.id.five_button);
@@ -538,9 +544,22 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        try{
+            Button help_button=(Button) findViewById(R.id.help_button);
+            help_button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(MainActivity.this, "简单的进行一些四则运算和进制转换", Toast.LENGTH_LONG).show();
+                }
+            });
+
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 }
+
 
 
 
